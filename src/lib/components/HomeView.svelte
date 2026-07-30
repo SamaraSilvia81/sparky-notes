@@ -1,6 +1,5 @@
 <script>
   import { createEventDispatcher } from "svelte";
-  import SparkIcon from "./SparkIcon.svelte";
   import logoIcon from "../../assets/logo-icon.png";
 
   const dispatch = createEventDispatcher();
@@ -86,7 +85,7 @@
           {:else}
             <div class="msg msg-spark">
               <div class="msg-avatar">
-                <SparkIcon size={16} />
+                <img src={logoIcon} alt="" class="avatar-logo" />
               </div>
               <div class="msg-bubble msg-bubble-spark">
                 <h4 class="msg-title">{msg.title}</h4>
@@ -117,7 +116,7 @@
         {#if isProcessing}
           <div class="msg msg-spark">
             <div class="msg-avatar">
-              <SparkIcon size={16} glow={true} />
+              <img src={logoIcon} alt="" class="avatar-logo glow" />
             </div>
             <div class="msg-bubble msg-bubble-spark processing-bubble">
               <div class="typing">
@@ -310,6 +309,17 @@
     justify-content: center;
     flex-shrink: 0;
     margin-top: 2px;
+  }
+
+  .avatar-logo {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+  }
+
+  .avatar-logo.glow {
+    filter: drop-shadow(0 0 6px rgba(139, 92, 246, 0.5));
+    animation: logo-pulse 2s ease-in-out infinite;
   }
 
   .msg-bubble {

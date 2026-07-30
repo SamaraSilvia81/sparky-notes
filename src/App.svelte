@@ -78,6 +78,7 @@
     <LibraryView
       {ollamaOnline}
       {ideasCount}
+      wallpaper=""
       on:close={() => (currentView = "home")}
     />
   {/if}
