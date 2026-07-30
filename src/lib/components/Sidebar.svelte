@@ -1,5 +1,6 @@
 <script>
   import SparkIcon from "./SparkIcon.svelte";
+  import Icon from "./Icon.svelte";
   import { activeCategory, categoryCounts, CATEGORIES } from "../stores/ideas.js";
 
   export let ollamaOnline = false;
@@ -28,7 +29,7 @@
           on:click={() => ($activeCategory = key)}
           type="button"
         >
-          <span class="nav-icon">{CATEGORIES[key].icon}</span>
+          <span class="nav-icon"><Icon name={CATEGORIES[key].icon} size={14} /></span>
           <span class="nav-text">{CATEGORIES[key].label}</span>
           {#if $categoryCounts[key] > 0}
             <span class="nav-count">{$categoryCounts[key]}</span>
@@ -157,10 +158,19 @@
   }
 
   .nav-icon {
-    font-size: 14px;
     width: 20px;
-    text-align: center;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
     flex-shrink: 0;
+    transition: color var(--transition-fast);
+  }
+
+  .nav-item:hover .nav-icon,
+  .nav-item.active .nav-icon {
+    color: var(--purple-300);
   }
 
   .nav-text {

@@ -47,12 +47,12 @@ export const viewMode = writable("grid");
 export const selectedIdeaId = writable(null);
 
 export const CATEGORIES = {
-  all: { label: "Tudo", icon: "⚡" },
-  projeto: { label: "Projetos", icon: "🔧" },
-  livro: { label: "Livros", icon: "📖" },
-  design: { label: "Design", icon: "✦" },
-  estudo: { label: "Estudo", icon: "📐" },
-  geral: { label: "Geral", icon: "💡" },
+  all: { label: "Tudo", icon: "bolt" },
+  projeto: { label: "Projetos", icon: "code" },
+  livro: { label: "Livros", icon: "book" },
+  design: { label: "Design", icon: "pen-tool" },
+  estudo: { label: "Estudo", icon: "compass" },
+  geral: { label: "Geral", icon: "lightbulb" },
 };
 
 export const STATUS_LABELS = {

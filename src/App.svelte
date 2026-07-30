@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import "./styles/global.css";
   import Grain from "./lib/components/Grain.svelte";
+  import Icon from "./lib/components/Icon.svelte";
   import CaptureInput from "./lib/components/CaptureInput.svelte";
   import IdeaCard from "./lib/components/IdeaCard.svelte";
   import IdeaRow from "./lib/components/IdeaRow.svelte";
@@ -72,7 +73,7 @@
       <div class="main">
         <header class="topbar" data-tauri-drag-region>
           <div class="topbar-left">
-            <span class="crumb-icon">{CATEGORIES[$activeCategory]?.icon ?? "⚡"}</span>
+            <span class="crumb-icon"><Icon name={CATEGORIES[$activeCategory]?.icon ?? "bolt"} size={13} /></span>
             <h1 class="crumb-title">{CATEGORIES[$activeCategory]?.label ?? "Tudo"}</h1>
             <span class="counter">{ideasCount}</span>
           </div>
@@ -149,8 +150,10 @@
   }
 
   .crumb-icon {
-    font-size: 13px;
-    opacity: 0.8;
+    display: flex;
+    align-items: center;
+    color: var(--text-tertiary);
+    opacity: 0.9;
   }
 
   .crumb-title {

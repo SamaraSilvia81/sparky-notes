@@ -256,12 +256,15 @@
   }
 
   .questions li::before {
-    content: "✦";
+    content: "";
     position: absolute;
     left: 0;
-    color: var(--purple-400);
-    font-size: 10px;
-    top: 3px;
+    top: 6px;
+    width: 5px;
+    height: 5px;
+    border-radius: 1px;
+    background: var(--purple-400);
+    transform: rotate(45deg);
   }
 
   .meta {
