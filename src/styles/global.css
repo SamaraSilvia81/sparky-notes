@@ -1,0 +1,97 @@
+:root {
+  --bg-base: #0b0a0f;
+  --bg-surface: #111017;
+  --bg-elevated: #161420;
+  --bg-input: #16141f;
+
+  --purple-50: #eeedfe;
+  --purple-100: #cecbf6;
+  --purple-200: #afa9ec;
+  --purple-400: #ad8ef8;
+  --purple-600: #7853ce;
+  --purple-800: #8b5cf6;
+  --purple-900: #6c43cd;
+
+  --pink-50: #fbeaf0;
+  --pink-100: #f3a2f2;
+  --pink-200: #f47ff2;
+  --pink-400: #f65cf4;
+  --pink-600: #ce2acb;
+  --pink-800: #c645c4;
+
+  --text-primary: #e8e4f0;
+  --text-secondary: #9994a8;
+  --text-muted: #5c5770;
+  --text-ghost: #3d3850;
+
+  --border-subtle: #221f30;
+  --border-default: #2e2a3d;
+  --border-accent: #534ab740;
+
+  --accent-glow: #7f77dd18;
+  --spark-gradient: linear-gradient(135deg, #f65cf4, #8b5cf6);
+
+  --glass-bg: rgba(17, 16, 23, 0.55);
+  --glass-bg-hover: rgba(22, 20, 32, 0.7);
+  --glass-bg-strong: rgba(22, 20, 32, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-border-hover: rgba(255, 255, 255, 0.12);
+  --glass-blur: blur(20px);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+
+  --font-display: "Satoshi", sans-serif;
+  --font-ui: "Plus Jakarta Sans", -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --transition-fast: 120ms ease;
+  --transition-base: 200ms ease;
+  --transition-slow: 350ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-ui);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--purple-800);
+}
+
+::selection {
+  background: var(--purple-600);
+  color: var(--text-primary);
+}
