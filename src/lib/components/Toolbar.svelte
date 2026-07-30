@@ -56,7 +56,8 @@
     flex: 1;
     max-width: 260px;
     color: var(--text-muted);
-    transition: border-color var(--transition-fast);
+    box-shadow: var(--elevation-1);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
   }
 
   .search-box:focus-within {

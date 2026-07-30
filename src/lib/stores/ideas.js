@@ -16,7 +16,7 @@ function createIdeasStore() {
           tags: idea.tags || [],
           suggestedStack: idea.suggestedStack || [],
           questions: idea.questions || [],
-          status: "spark",
+          status: "idea",
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         },
@@ -42,7 +42,7 @@ function createIdeasStore() {
 export const ideas = createIdeasStore();
 export const searchQuery = writable("");
 export const activeCategory = writable("all");
-export const activeStatus = writable("all");
+export const statusFilter = writable("all");
 export const viewMode = writable("grid");
 export const selectedIdeaId = writable(null);
 
@@ -55,17 +55,15 @@ export const CATEGORIES = {
   geral: { label: "Geral", icon: "💡" },
 };
 
-export const STATUSES = {
-  spark: { label: "spark", color: "var(--text-muted)" },
-  refining: { label: "refinando", color: "var(--purple-400)" },
-  ready: { label: "pronto", color: "var(--pink-400)" },
-  building: { label: "construindo", color: "var(--purple-500)" },
-  done: { label: "concluído", color: "var(--success)" },
-  archived: { label: "arquivado", color: "var(--text-ghost)" },
+export const STATUS_LABELS = {
+  idea: "ideia",
+  dev: "em dev",
+  paused: "pausado",
+  done: "concluído",
 };
 
 export const filteredIdeas = derived(
-  [ideas, searchQuery, activeCategory, activeStatus],
+  [ideas, searchQuery, activeCategory, statusFilter],
   ([$ideas, $search, $category, $status]) => {
     let result = $ideas;
 

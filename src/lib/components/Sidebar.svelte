@@ -50,12 +50,31 @@
   .sidebar {
     width: var(--sidebar-width);
     height: 100%;
-    background: var(--bg-sidebar);
-    border-right: 0.5px solid var(--border-subtle);
+    background: var(--glass-bg-sunken);
+    backdrop-filter: var(--glass-blur-lg);
+    -webkit-backdrop-filter: var(--glass-blur-lg);
+    border-right: 0.5px solid var(--glass-border);
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
     user-select: none;
+    position: relative;
+  }
+
+  .sidebar::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      rgba(139, 92, 246, 0.25) 30%,
+      rgba(246, 92, 244, 0.18) 70%,
+      transparent
+    );
   }
 
   .sidebar-header {
@@ -133,7 +152,8 @@
 
   .nav-item.active {
     color: var(--text-primary);
-    background: rgba(139, 92, 246, 0.1);
+    background: rgba(139, 92, 246, 0.12);
+    box-shadow: 0 0 0 0.5px rgba(139, 92, 246, 0.3) inset;
   }
 
   .nav-icon {
@@ -158,7 +178,7 @@
 
   .sidebar-footer {
     padding: 12px 16px;
-    border-top: 0.5px solid var(--border-subtle);
+    border-top: 0.5px solid var(--glass-border);
   }
 
   .status-row {

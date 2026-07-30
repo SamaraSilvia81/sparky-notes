@@ -38,7 +38,13 @@
 </script>
 
 <div class="capture" class:expanded={isExpanded} class:processing={isProcessing}>
-  <div class="capture-bar" on:click={() => { isExpanded = true; textareaEl?.focus(); }}>
+  <div
+    class="capture-bar"
+    role="button"
+    tabindex="0"
+    on:click={() => { isExpanded = true; textareaEl?.focus(); }}
+    on:keydown={(e) => { if (e.key === "Enter" || e.key === " ") { isExpanded = true; textareaEl?.focus(); } }}
+  >
     <SparkIcon size={16} glow={isProcessing} />
     <span class="placeholder" class:hidden={isExpanded}>nova spark — despeje uma ideia...</span>
     <div class="shortcuts">
@@ -88,18 +94,20 @@
     -webkit-backdrop-filter: var(--glass-blur);
     border: 0.5px solid var(--glass-border);
     border-radius: var(--radius-lg);
+    box-shadow: var(--elevation-1);
     transition: all var(--transition-smooth);
     overflow: hidden;
   }
 
   .capture:hover:not(.expanded) {
     border-color: var(--glass-border-hover);
+    box-shadow: var(--elevation-2);
   }
 
   .capture.expanded {
     border-color: var(--border-accent);
     background: var(--glass-bg-active);
-    box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.08), 0 8px 32px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--glow-accent), var(--elevation-3);
   }
 
   .capture.processing {

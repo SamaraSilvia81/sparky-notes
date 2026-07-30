@@ -2,14 +2,14 @@
   import { onMount } from "svelte";
   import "./styles/global.css";
   import Grain from "./lib/components/Grain.svelte";
-  import SparkIcon from "./lib/components/SparkIcon.svelte";
   import CaptureInput from "./lib/components/CaptureInput.svelte";
   import IdeaCard from "./lib/components/IdeaCard.svelte";
   import IdeaRow from "./lib/components/IdeaRow.svelte";
   import IdeaDetail from "./lib/components/IdeaDetail.svelte";
   import Toolbar from "./lib/components/Toolbar.svelte";
+  import Sidebar from "./lib/components/Sidebar.svelte";
   import EmptyState from "./lib/components/EmptyState.svelte";
-  import { ideas, filteredIdeas, viewMode } from "./lib/stores/ideas.js";
+  import { ideas, filteredIdeas, viewMode, activeCategory, CATEGORIES } from "./lib/stores/ideas.js";
   import { initPersistence } from "./lib/stores/persistence.js";
   import { processIdea, checkOllamaStatus } from "./lib/services/ollama.js";
 
@@ -59,54 +59,51 @@
   }
 </script>
 
+<div class="ambient-field" aria-hidden="true" />
 <Grain />
 
-<div class="app" data-tauri-drag-region>
+<div class="app">
   {#if selectedIdea}
     <IdeaDetail idea={selectedIdea} on:close={handleCloseDetail} />
   {:else}
-    <div class="layout">
-      <header class="header" data-tauri-drag-region>
-        <div class="header-left">
-          <SparkIcon size={22} />
-          <div class="brand">
-            <span class="brand-sparky">Sparky</span>
-            <span class="brand-notes">Notes</span>
+    <div class="shell">
+      <Sidebar {ollamaOnline} />
+
+      <div class="main">
+        <header class="topbar" data-tauri-drag-region>
+          <div class="topbar-left">
+            <span class="crumb-icon">{CATEGORIES[$activeCategory]?.icon ?? "⚡"}</span>
+            <h1 class="crumb-title">{CATEGORIES[$activeCategory]?.label ?? "Tudo"}</h1>
+            <span class="counter">{ideasCount}</span>
           </div>
-          <span class="counter">{ideasCount} sparks</span>
-        </div>
-        <div class="header-right">
-          <span class="ollama-status" class:online={ollamaOnline}>
-            {ollamaOnline ? "ollama ativo" : "ollama offline"}
-          </span>
-        </div>
-      </header>
+        </header>
 
-      <section class="capture-section">
-        <CaptureInput bind:this={captureRef} on:capture={handleCapture} />
-      </section>
+        <section class="capture-section">
+          <CaptureInput bind:this={captureRef} on:capture={handleCapture} />
+        </section>
 
-      <section class="panel-section">
-        <Toolbar />
+        <section class="panel-section">
+          <Toolbar />
 
-        <div class="ideas-container">
-          {#if $filteredIdeas.length === 0}
-            <EmptyState />
-          {:else if $viewMode === "grid"}
-            <div class="ideas-grid">
-              {#each $filteredIdeas as idea (idea.id)}
-                <IdeaCard {idea} on:select={handleSelect} />
-              {/each}
-            </div>
-          {:else}
-            <div class="ideas-list">
-              {#each $filteredIdeas as idea (idea.id)}
-                <IdeaRow {idea} on:select={handleSelect} />
-              {/each}
-            </div>
-          {/if}
-        </div>
-      </section>
+          <div class="ideas-container">
+            {#if $filteredIdeas.length === 0}
+              <EmptyState />
+            {:else if $viewMode === "grid"}
+              <div class="ideas-grid">
+                {#each $filteredIdeas as idea (idea.id)}
+                  <IdeaCard {idea} on:select={handleSelect} />
+                {/each}
+              </div>
+            {:else}
+              <div class="ideas-list">
+                {#each $filteredIdeas as idea (idea.id)}
+                  <IdeaRow {idea} on:select={handleSelect} />
+                {/each}
+              </div>
+            {/if}
+          </div>
+        </section>
+      </div>
     </div>
   {/if}
 </div>
@@ -114,23 +111,30 @@
 <style>
   .app {
     height: 100vh;
-    display: flex;
-    flex-direction: column;
+    position: relative;
+    z-index: 1;
     overflow: hidden;
   }
 
-  .layout {
+  .shell {
     display: flex;
-    flex-direction: column;
     height: 100%;
     overflow: hidden;
   }
 
-  .header {
+  .main {
+    flex: 1;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .topbar {
+    display: flex;
     align-items: center;
-    padding: 14px 24px;
+    justify-content: space-between;
+    padding: 13px 24px;
     border-bottom: 0.5px solid var(--glass-border);
     background: var(--glass-bg);
     backdrop-filter: var(--glass-blur);
@@ -138,71 +142,36 @@
     flex-shrink: 0;
   }
 
-  .header-left {
+  .topbar-left {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 9px;
   }
 
-  .brand {
-    display: flex;
-    align-items: baseline;
-    gap: 6px;
+  .crumb-icon {
+    font-size: 13px;
+    opacity: 0.8;
   }
 
-  .brand-sparky {
+  .crumb-title {
     font-family: var(--font-display);
-    font-size: 16px;
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 600;
     color: var(--text-primary);
-  }
-
-  .brand-notes {
-    font-family: var(--font-display);
-    font-size: 16px;
-    font-weight: 500;
-    background: var(--spark-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    letter-spacing: -0.1px;
   }
 
   .counter {
     font-size: 11px;
-    color: var(--text-ghost);
-    font-family: var(--font-mono);
-    margin-left: 4px;
-  }
-
-  .header-right {
-    display: flex;
-    align-items: center;
-  }
-
-  .ollama-status {
-    font-size: 10px;
     font-family: var(--font-mono);
     color: var(--text-ghost);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .ollama-status::before {
-    content: "";
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--pink-600);
-  }
-
-  .ollama-status.online::before {
-    background: #5dca75;
-    box-shadow: 0 0 6px rgba(93, 202, 117, 0.4);
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: var(--radius-xs);
+    padding: 1px 6px;
   }
 
   .capture-section {
-    padding: 20px 24px 16px;
+    padding: 18px 24px 14px;
     flex-shrink: 0;
   }
 
@@ -229,5 +198,8 @@
 
   .ideas-list {
     border-top: 0.5px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--glass-bg-sunken);
   }
 </style>

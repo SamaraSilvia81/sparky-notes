@@ -83,15 +83,18 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    box-shadow: var(--elevation-1);
     transition: border-color var(--transition-fast),
       transform var(--transition-fast),
-      background var(--transition-fast);
+      background var(--transition-fast),
+      box-shadow var(--transition-fast);
   }
 
   .card:hover {
     border-color: var(--glass-border-hover);
     background: var(--glass-bg-hover);
     transform: translateY(-2px);
+    box-shadow: var(--elevation-2);
   }
 
   .card:focus-visible {
