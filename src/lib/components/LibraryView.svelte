@@ -6,8 +6,10 @@
   import Toolbar from "./Toolbar.svelte";
   import EmptyState from "./EmptyState.svelte";
   import Icon from "./Icon.svelte";
-  import logoIcon from "../../assets/logo-icon.png";
+  import { currentUser } from "../stores/auth.js";
+  import loginWp from "../../assets/login-wallpaper.jpg";
   import {
+    ideas,
     filteredIdeas,
     viewMode,
     activeCategory,
@@ -24,6 +26,13 @@
   let selectedIdea = null;
   const categoryKeys = Object.keys(CATEGORIES);
 
+  $: userAvatar = $currentUser?.user_metadata?.avatar_url || "";
+  $: userName = $currentUser?.user_metadata?.full_name || $currentUser?.user_metadata?.name || "";
+  $: userInitial = userName ? userName.charAt(0).toUpperCase() : "";
+  $: effectiveWallpaper = wallpaper || loginWp;
+  $: devCount = $ideas.filter((i) => i.status === "dev").length;
+  $: ideaStatusCount = $ideas.filter((i) => i.status === "idea").length;
+
   function handleSelect(event) {
     selectedIdea = event.detail;
   }
@@ -34,12 +43,14 @@
 </script>
 
 <div class="library">
-  <!-- wallpaper layer -->
-  {#if wallpaper}
-    <div class="wallpaper" style="background-image: url({wallpaper})" aria-hidden="true" />
+  <!-- wallpaper layer (hidden in detail view, so it looks like Home there) -->
+  {#if !selectedIdea}
+    {#if effectiveWallpaper}
+      <div class="wallpaper" style="background-image: url({effectiveWallpaper})" aria-hidden="true" />
+    {/if}
+    <div class="wallpaper-overlay" aria-hidden="true" />
+    <div class="lib-grid-bg" aria-hidden="true" />
   {/if}
-  <div class="wallpaper-overlay" aria-hidden="true" />
-  <div class="lib-grid-bg" aria-hidden="true" />
 
   {#if selectedIdea}
     <div class="detail-wrap">
@@ -47,23 +58,69 @@
     </div>
   {:else}
     <div class="lib-layout">
-      <!-- top bar -->
-      <header class="topbar" data-tauri-drag-region>
-        <div class="topbar-left">
-          <button class="btn-back" on:click={() => dispatch("close")} type="button" aria-label="Voltar ao início">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="19" y1="12" x2="5" y2="12" />
-              <polyline points="12 19 5 12 12 5" />
-            </svg>
+      <!-- mini top bar -->
+      <div class="mini-topbar" data-tauri-drag-region>
+        <button class="btn-back" on:click={() => dispatch("close")} type="button" aria-label="Voltar ao início">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12" />
+            <polyline points="12 19 5 12 12 5" />
+          </svg>
+          voltar
+        </button>
+
+        <div class="topbar-right-group">
+          <span class="ollama-tag" class:online={ollamaOnline}>
+            <span class="o-dot" />
+            {ollamaOnline ? "ollama.local" : "offline"}
+          </span>
+          <button class="profile-chip" on:click={() => dispatch("openProfile")} type="button">
+            {#if userAvatar}
+              <img src={userAvatar} alt="" class="profile-chip-avatar" referrerpolicy="no-referrer" />
+            {:else}
+              <span class="profile-chip-fallback">{userInitial || "?"}</span>
+            {/if}
           </button>
-          <img src={logoIcon} alt="" class="topbar-logo" />
-          <span class="topbar-brand">Biblioteca</span>
         </div>
-        <div class="topbar-right">
-          <div class="status-indicator">
-            <span class="status-dot" class:online={ollamaOnline} />
-            <span class="status-label">{ollamaOnline ? "ollama" : "offline"}</span>
-          </div>
+      </div>
+
+      <!-- hero -->
+      <header class="lib-hero">
+        <p class="hero-eyebrow">
+          <span class="eyebrow-rule" aria-hidden="true" />
+          painel de sparks
+        </p>
+        <h1 class="hero-title">
+          <span>SUAS</span>
+          <span class="hero-accent">SPARKS</span>
+        </h1>
+        <p class="hero-terminal">
+          <span class="prompt">&gt;_</span>
+          {$filteredIdeas.length} resultado{$filteredIdeas.length === 1 ? "" : "s"}
+          <span class="dot">·</span>
+          {ideasCount} no total
+          <span class="dot">·</span>
+          {ollamaOnline ? "ollama.local" : "offline"}
+        </p>
+
+        <div class="hero-row">
+          <nav class="category-bar">
+            {#each categoryKeys as key}
+              <button
+                class="cat-tab"
+                class:active={$activeCategory === key}
+                on:click={() => ($activeCategory = key)}
+                type="button"
+              >
+                <span class="cat-slash">//</span>
+                <span class="cat-icon"><Icon name={CATEGORIES[key].icon} size={13} /></span>
+                <span class="cat-label">{CATEGORIES[key].label}</span>
+                {#if $categoryCounts[key] > 0}
+                  <span class="cat-count">{$categoryCounts[key]}</span>
+                {/if}
+              </button>
+            {/each}
+          </nav>
+
           <button class="btn-new" on:click={() => dispatch("close")} type="button">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
               <path d="M12 5v14M5 12h14" />
@@ -71,25 +128,13 @@
             nova spark
           </button>
         </div>
-      </header>
 
-      <!-- category tabs -->
-      <nav class="category-bar">
-        {#each categoryKeys as key}
-          <button
-            class="cat-tab"
-            class:active={$activeCategory === key}
-            on:click={() => ($activeCategory = key)}
-            type="button"
-          >
-            <span class="cat-icon"><Icon name={CATEGORIES[key].icon} size={13} /></span>
-            <span class="cat-label">{CATEGORIES[key].label}</span>
-            {#if $categoryCounts[key] > 0}
-              <span class="cat-count">{$categoryCounts[key]}</span>
-            {/if}
-          </button>
-        {/each}
-      </nav>
+        <div class="hero-stats">
+          <span class="hero-stat"><i class="dot-total" />total <b>{ideasCount}</b></span>
+          <span class="hero-stat"><i class="dot-dev" />em dev <b>{devCount}</b></span>
+          <span class="hero-stat"><i class="dot-idea" />ideias <b>{ideaStatusCount}</b></span>
+        </div>
+      </header>
 
       <!-- content -->
       <section class="panel-section">
@@ -176,83 +221,186 @@
     overflow: hidden;
   }
 
-  /* ── topbar ── */
-  .topbar {
+  /* ── mini topbar ── */
+  .mini-topbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 24px;
-    border-bottom: 0.5px solid var(--glass-border);
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
+    padding: 14px 24px 0;
     flex-shrink: 0;
-  }
-
-  .topbar-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .topbar-right {
-    display: flex;
-    align-items: center;
-    gap: 14px;
   }
 
   .btn-back {
     all: unset;
     display: flex;
     align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: var(--radius-md);
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.3px;
     color: var(--text-tertiary);
-    transition: all var(--transition-fast);
+    padding: 6px 4px;
+    transition: color var(--transition-fast);
   }
 
   .btn-back:hover {
     color: var(--text-primary);
-    background: rgba(255, 255, 255, 0.05);
   }
 
-  .topbar-logo {
-    width: 24px;
-    height: 24px;
-    object-fit: contain;
+  .profile-chip {
+    all: unset;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--glass-bg);
+    transition: border-color var(--transition-fast);
   }
 
-  .topbar-brand {
+  .profile-chip:hover {
+    border-color: var(--purple-500);
+  }
+
+  .topbar-right-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .ollama-tag {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-secondary);
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    background: rgba(15, 14, 22, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 0.5px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .o-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #ef4444;
+  }
+
+  .ollama-tag.online .o-dot {
+    background: var(--success);
+    box-shadow: 0 0 4px rgba(52, 211, 153, 0.4);
+  }
+
+  .ollama-tag.online {
+    color: var(--text-secondary);
+  }
+
+  .profile-chip-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .profile-chip-fallback {
     font-family: var(--font-display);
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text-primary);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
   }
 
-  .status-indicator {
+  /* ── editorial hero ── */
+  .lib-hero {
+    position: relative;
+    padding: 20px 24px 18px;
+    border-bottom: 0.5px solid var(--border-subtle);
+    flex-shrink: 0;
+  }
+
+  .hero-corner-tl {
+    position: absolute;
+    top: 0;
+    left: 24px;
+    width: 18px;
+    height: 18px;
+    border-left: 1.5px solid var(--atelier-crimson);
+    border-top: 1.5px solid var(--atelier-crimson);
+    opacity: 0.7;
+  }
+
+  .hero-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .eyebrow-rule {
+    width: 20px;
+    height: 1px;
+    background: var(--atelier-crimson);
+  }
+
+  .hero-title {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 40px;
+    line-height: 0.98;
+    letter-spacing: -0.5px;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .hero-accent {
+    background: var(--spark-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-terminal {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-bottom: 18px;
     display: flex;
     align-items: center;
     gap: 6px;
+    flex-wrap: wrap;
   }
 
-  .status-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--pink-600);
+  .prompt {
+    color: var(--atelier-crimson-bright);
+    font-weight: 600;
   }
 
-  .status-dot.online {
-    background: var(--success);
-    box-shadow: 0 0 6px rgba(52, 211, 153, 0.4);
+  .hero-terminal .dot {
+    color: var(--text-ghost);
   }
 
-  .status-label {
-    font-size: 11px;
-    font-family: var(--font-mono);
-    color: var(--text-muted);
+  .hero-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
   }
 
   .btn-new {
@@ -267,6 +415,7 @@
     background: var(--spark-gradient);
     padding: 7px 14px;
     border-radius: var(--radius-md);
+    flex-shrink: 0;
     transition: opacity var(--transition-fast), transform var(--transition-fast);
   }
 
@@ -275,12 +424,43 @@
     transform: translateY(-1px);
   }
 
+  .hero-stats {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .hero-stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .hero-stat b {
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  .hero-stat i {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .dot-total { background: var(--text-muted); }
+  .dot-dev { background: var(--purple-400); }
+  .dot-idea { background: var(--atelier-crimson-bright); }
+
   /* ── category tabs ── */
   .category-bar {
     display: flex;
     gap: 4px;
-    padding: 10px 24px;
-    border-bottom: 0.5px solid var(--border-subtle);
     overflow-x: auto;
     flex-shrink: 0;
   }
@@ -293,11 +473,11 @@
     all: unset;
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
+    gap: 5px;
+    padding: 6px 12px;
     border-radius: var(--radius-md);
-    font-family: var(--font-ui);
-    font-size: 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
     color: var(--text-tertiary);
     white-space: nowrap;
     transition: all var(--transition-fast);
@@ -316,8 +496,14 @@
     box-shadow: var(--elevation-1);
   }
 
-  .cat-tab.active .cat-icon {
-    color: var(--purple-300);
+  .cat-tab.active .cat-icon,
+  .cat-tab.active .cat-slash {
+    color: var(--atelier-crimson-bright);
+  }
+
+  .cat-slash {
+    color: var(--text-ghost);
+    font-weight: 600;
   }
 
   .cat-icon {
@@ -328,6 +514,7 @@
   }
 
   .cat-label {
+    font-family: var(--font-ui);
     font-weight: 500;
   }
 

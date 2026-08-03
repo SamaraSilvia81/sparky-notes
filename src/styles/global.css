@@ -64,6 +64,14 @@
   --font-display: "Satoshi", sans-serif;
   --font-ui: "Plus Jakarta Sans", -apple-system, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
+  --font-serif: "Cormorant Garamond", serif;
+
+  /* atelier accents — used in hero/wallpaper/splash surfaces for a more
+     editorial, hand-set feel instead of the generic glass-panel look */
+  --atelier-crimson: #8b5cf6;
+  --atelier-crimson-bright: #a78bfa;
+  --atelier-paper: #f4ece2;
+  --atelier-ink: #17140f;
 
   --transition-fast: 100ms ease;
   --transition-base: 180ms ease;

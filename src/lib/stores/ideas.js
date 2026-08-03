@@ -57,9 +57,13 @@ export const CATEGORIES = {
 
 export const STATUS_LABELS = {
   idea: "ideia",
+  refining: "refinando",
+  ready: "pronta",
+  building: "em dev",
   dev: "em dev",
   paused: "pausado",
   done: "concluído",
+  archived: "arquivado",
 };
 
 export const filteredIdeas = derived(

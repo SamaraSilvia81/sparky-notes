@@ -8,14 +8,13 @@
   const dispatch = createEventDispatcher();
 
   const STATUS_STYLES = {
-    spark: { bg: "rgba(255,255,255,0.04)", color: "var(--text-muted)", border: "var(--glass-border)", dot: "var(--text-ghost)" },
+    idea: { bg: "rgba(255,255,255,0.04)", color: "var(--text-muted)", border: "var(--glass-border)", dot: "var(--text-ghost)" },
     refining: { bg: "rgba(139,92,246,0.1)", color: "var(--purple-200)", border: "rgba(139,92,246,0.2)", dot: "var(--purple-400)" },
     ready: { bg: "rgba(246,92,244,0.1)", color: "var(--pink-200)", border: "rgba(246,92,244,0.2)", dot: "var(--pink-400)" },
     building: { bg: "rgba(139,92,246,0.12)", color: "var(--purple-200)", border: "rgba(139,92,246,0.25)", dot: "var(--purple-500)" },
     done: { bg: "rgba(52,211,153,0.1)", color: "var(--success)", border: "rgba(52,211,153,0.2)", dot: "var(--success)" },
     archived: { bg: "rgba(255,255,255,0.02)", color: "var(--text-ghost)", border: "var(--glass-border)", dot: "var(--text-ghost)" },
     // fallback for old statuses
-    idea: { bg: "rgba(255,255,255,0.04)", color: "var(--text-muted)", border: "var(--glass-border)", dot: "var(--text-ghost)" },
     dev: { bg: "rgba(139,92,246,0.12)", color: "var(--purple-200)", border: "rgba(139,92,246,0.25)", dot: "var(--purple-500)" },
     paused: { bg: "rgba(246,92,244,0.1)", color: "var(--pink-200)", border: "rgba(246,92,244,0.2)", dot: "var(--pink-400)" },
   };
@@ -28,7 +27,7 @@
     geral: "lightbulb",
   };
 
-  $: style = STATUS_STYLES[idea.status] || STATUS_STYLES.spark;
+  $: style = STATUS_STYLES[idea.status] || STATUS_STYLES.idea;
   $: statusLabel = STATUS_LABELS[idea.status] || idea.status;
 
   function formatDate(iso) {
@@ -121,10 +120,10 @@
 
   .card-inner {
     position: relative;
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border: 0.5px solid var(--glass-border);
+    background: rgba(10, 9, 16, 0.75);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 0.5px solid rgba(255, 255, 255, 0.08);
     border-radius: var(--radius-lg);
     padding: 16px 18px;
     display: flex;
@@ -135,7 +134,8 @@
   }
 
   .card:hover .card-inner {
-    border-color: var(--glass-border-hover);
+    border-color: rgba(255, 255, 255, 0.14);
+    background: rgba(12, 11, 20, 0.82);
   }
 
   .card-top {
